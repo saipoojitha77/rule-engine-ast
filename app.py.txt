@@ -1,0 +1,40 @@
+# app.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+from ast import parse_rule
+from evaluator import evaluate_node
+
+app = FastAPI()
+
+# In-memory storage for rules
+rules_db = {}
+
+
+# Request Models
+class RuleRequest(BaseModel):
+    rule_string: str
+
+
+class EvaluateRequest(BaseModel):
+    rule_id: str
+    data: dict
+
+
+# API to create a new rule
+@app.post("/create_rule")
+def create_rule(request: RuleRequest):
+    rule_id = f"rule_{len(rules_db) + 1}"
+    ast = parse_rule(request.rule_string)
+    rules_db[rule_id] = ast
+    return {"status": "success", "rule_id": rule_id, "ast": repr(ast)}
+
+
+# API to evaluate a rule with given user data
+@app.post("/evaluate_rule")
+def evaluate_rule(request: EvaluateRequest):
+    ast = rules_db.get(request.rule_id)
+    if not ast:
+        return {"error": "Rule not found"}, 404
+
+    result = evaluate_node(ast, request.data)
+    return {"status": "success", "eligible": result}

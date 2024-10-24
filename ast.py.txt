@@ -1,0 +1,28 @@
+# ast.py
+class ASTNode:
+    def __init__(self, node_type, value=None, left=None, right=None):
+        self.node_type = node_type  # "operator" or "operand"
+        self.value = value  # Only used for operand nodes
+        self.left = left
+        self.right = right
+
+    def is_operator(self):
+        return self.node_type == 'operator'
+
+    def is_operand(self):
+        return self.node_type == 'operand'
+
+
+# Function to parse a rule string and create an AST
+def parse_rule(rule_string):
+    # Simplified parsing logic to construct AST from a rule string
+    import re
+    rule_string = rule_string.strip()
+    if 'AND' in rule_string or 'OR' in rule_string:
+        # Recursive parsing: extract left, operator, and right parts
+        operator = 'AND' if 'AND' in rule_string else 'OR'
+        left, right = re.split(r'\s+' + operator + r'\s+', rule_string, 1)
+        return ASTNode('operator', value=operator, left=parse_rule(left), right=parse_rule(right))
+    else:
+        # Parse condition (operand)
+        return ASTNode('operand', value=rule_string)

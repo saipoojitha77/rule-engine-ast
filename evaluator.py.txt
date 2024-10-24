@@ -1,0 +1,26 @@
+# evaluator.py
+def evaluate_node(node, data):
+    if node.is_operand():
+        return evaluate_condition(node.value, data)
+    elif node.is_operator():
+        left_result = evaluate_node(node.left, data)
+        right_result = evaluate_node(node.right, data)
+        if node.value == 'AND':
+            return left_result and right_result
+        elif node.value == 'OR':
+            return left_result or right_result
+
+
+def evaluate_condition(condition, data):
+    # Example: condition = "age > 30", data = {"age": 35}
+    # Extract the attribute (e.g., age), operator (e.g., >), and value (e.g., 30)
+    attribute, operator, value = condition.split(' ')
+    value = int(value) if value.isdigit() else value.strip("'")
+    if operator == '>':
+        return data.get(attribute) > value
+    elif operator == '<':
+        return data.get(attribute) < value
+    elif operator == '=':
+        return data.get(attribute) == value
+    else:
+        raise ValueError(f"Unsupported operator {operator}")

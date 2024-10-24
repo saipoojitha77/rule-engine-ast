@@ -1,0 +1,27 @@
+# tests/test_rules.py
+import unittest
+from ast import parse_rule
+from evaluator import evaluate_node
+
+class TestRuleEngine(unittest.TestCase):
+    def test_rule_creation(self):
+        rule = "age > 30 AND department = 'Sales'"
+        ast = parse_rule(rule)
+        self.assertEqual(ast.value, 'AND')
+
+    def test_rule_evaluation(self):
+        rule = "age > 30 AND department = 'Sales'"
+        ast = parse_rule(rule)
+        data = {"age": 35, "department": "Sales"}
+        result = evaluate_node(ast, data)
+        self.assertTrue(result)
+
+    def test_invalid_data(self):
+        rule = "age > 30 AND department = 'Sales'"
+        ast = parse_rule(rule)
+        data = {"age": 25, "department": "Marketing"}
+        result = evaluate_node(ast, data)
+        self.assertFalse(result)
+
+if __name__ == "__main__":
+    unittest.main()
